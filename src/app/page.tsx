@@ -1,95 +1,77 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import type React from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthContext } from "@/contexts/auth.context";
+import { AuthUseCase } from "@/usecases/auth.usecase";
+import { CustomButton, Form, Input, LogoContainer, Main } from "./page.style";
+import Image from "next/image";
+
+export default function Login() {
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { currentUser, userData, isLoading } = useAuthContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    // Recuperar el nombre del localStorage si existe
+    if (typeof window !== "undefined") {
+      const savedName = localStorage.getItem("userName");
+      if (savedName) {
+        setName(savedName);
+      }
+    }
+
+    // Si el usuario ya está autenticado y existe en la base de datos, redirigir a select-room
+    if (currentUser && userData) {
+      router.push("/select-room");
+    }
+  }, [currentUser, userData, isLoading, router]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!name.trim()) return;
+
+    try {
+      setLoading(true);
+      await AuthUseCase.loginWithName(name);
+      router.push("/select-room");
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
+    <Main>
+      <LogoContainer>
         <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
+          src="/easy-doritos.webp"
+          alt="Logo"
+          width={200}
+          height={200}
           priority
         />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </LogoContainer>
+      <div>
+        <Form onSubmit={handleLogin}>
+          <Input
+            type="text"
+            placeholder="Tu nombre"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
           />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <CustomButton type="submit" disabled={loading || !name.trim()}>
+            {loading ? "Conectando..." : "Ingresar"}
+          </CustomButton>
+        </Form>
+      </div>
+    </Main>
   );
 }
