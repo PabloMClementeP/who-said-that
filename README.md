@@ -32,7 +32,7 @@
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/PabloMClementeP/who-said-it.git
+git clone https://github.com/PabloMClementeP/who-said-that.git
 cd who-said-it
 ```
 
@@ -114,7 +114,7 @@ Distribuido bajo la licencia MIT. Ver `LICENSE` para más información.
 
 pclementep@gmail.com
 
-Link del proyecto: [proximamente](/)
+Link del proyecto: [Vercel Hosting](https://who-said-that-eta.vercel.app/)
 
 ---
 
