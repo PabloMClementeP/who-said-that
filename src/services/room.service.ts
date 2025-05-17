@@ -109,6 +109,17 @@ export class RoomService {
       throw error;
     }
   }
+  
+  // Cambiar el estado de la sala a "responding" (para iniciar el juego)
+  static async startGame(roomId: string): Promise<void> {
+    try {
+      const roomRef = ref(db, `rooms/${roomId}`);
+      await update(roomRef, { status: "responding" });
+    } catch (error) {
+      console.error("Error en startGame:", error);
+      throw error;
+    }
+  }
 
   // Añadir un usuario a una sala
   static async addUserToRoom(roomId: string, user: User): Promise<void> {

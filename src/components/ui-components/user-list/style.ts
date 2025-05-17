@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Sidebar = styled.div`
   background-color: #fff;
   min-width: 300px;
-  height: 100%;
+  height: calc(100vh - 100px);
   position: absolute;
   right: 0;
   display: "flex";

@@ -9,6 +9,7 @@ interface UserListProps {
 
 const UserList = ({ roomId }: UserListProps) => {
   const { users } = useHall(roomId);
+
   return (
     <Sidebar>
       {users?.map((user) => (

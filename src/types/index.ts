@@ -13,7 +13,7 @@ export interface Room {
   roomId: string;
   creatorUid: string;
   createdAt: string;
-  status?: "waiting" | "active";
+  status?: "waiting" | "active" | "responding";
   users: Record<string, User>;
 }
 

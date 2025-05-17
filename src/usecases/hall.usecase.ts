@@ -65,6 +65,34 @@ export class HallUseCase {
     }
   }
 
+  // Iniciar el juego (solo el creador puede hacerlo)
+  static async startGame(roomId: string): Promise<void> {
+    try {
+      const currentUser = AuthService.getCurrentUser();
+
+      if (!currentUser) {
+        throw new Error("Usuario no autenticado");
+      }
+
+      // Verificar si la sala existe y si el usuario es el creador
+      const roomData = await RoomService.getRoomData(roomId);
+
+      if (!roomData) {
+        throw new Error("La sala no existe");
+      }
+
+      if (roomData.creatorUid !== currentUser.uid) {
+        throw new Error("Solo el creador puede iniciar el juego");
+      }
+
+      // Cambiar el estado de la sala a "responding"
+      await RoomService.startGame(roomId);
+    } catch (error) {
+      console.error("Error en startGame:", error);
+      throw error;
+    }
+  }
+
   // Verificar si el usuario actual es el creador de la sala
   static async isRoomCreator(roomId: string): Promise<boolean> {
     try {

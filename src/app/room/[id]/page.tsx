@@ -16,7 +16,7 @@ export default function Room() {
   const params = useParams();
   const roomId = params.id as string;
 
-  const { users, loading: roomLoading, error, leaveRoom } = useRoom(roomId);
+  const { loading: roomLoading, error, leaveRoom } = useRoom(roomId);
 
   useEffect(() => {
     if (isLoading) return;
@@ -88,11 +88,9 @@ export default function Room() {
   return (
     <HallWrapper>
       <div>
-        <p>Sala: ${roomId}</p>
         <button onClick={handleLeaveRoom}>Salir de la sala</button>
       </div>
 
-      {/* <UserList users={users} currentUserId={currentUser?.uid} /> */}
       <UserList roomId={roomId} />
     </HallWrapper>
   );

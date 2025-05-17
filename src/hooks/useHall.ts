@@ -66,6 +66,14 @@ export function useHall(roomId: string) {
     }
   };
 
+  const startGame = async () => {
+    try {
+      await HallUseCase.startGame(roomId);
+    } catch (err) {
+      setError("Error al iniciar el juego");
+    }
+  };
+
   return {
     users,
     room,
@@ -73,5 +81,6 @@ export function useHall(roomId: string) {
     loading,
     error,
     startRoom,
+    startGame,
   };
 }

@@ -24,6 +24,7 @@ export default function Hall() {
     loading: hallLoading,
     error,
     startRoom,
+    startGame,
   } = useHall(roomId);
 
   useEffect(() => {
@@ -60,17 +61,32 @@ export default function Hall() {
   }, [currentUser, userData, roomId, router, checkUserExists, isLoading]);
 
   useEffect(() => {
-    if (room && room.status === "active") {
-      // Si la sala está activa, redirigir a la página de la sala
-      router.push(`/room/${roomId}`);
+    if (room) {
+      if (room.status === "active") {
+        // Si la sala está activa, redirigir a la página de la sala
+        router.push(`/room/${roomId}`);
+      } else if (room.status === "responding") {
+        // Si la sala está en modo de respuesta, redirigir a la página de preguntas
+        router.push(`/questions/${roomId}`);
+      }
     }
   }, [room, roomId, router]);
 
-  const handleStartRoom = async () => {
+  // const handleStartRoom = async () => {
+  //   try {
+  //     await startRoom();
+  //   } catch (error) {
+  //     console.error("Error al iniciar la sala:", error);
+  //   }
+  // };
+
+  const handleStartGame = async () => {
     try {
-      await startRoom();
+      await startGame();
+      // No es necesario hacer router.push aquí, ya que el efecto detectará el cambio de estado
+      // y redirigirá automáticamente a todos los usuarios
     } catch (error) {
-      console.error("Error al iniciar la sala:", error);
+      console.error("Error al iniciar el juego: ", error);
     }
   };
 
@@ -145,7 +161,7 @@ export default function Hall() {
               width: "150px",
             }}
           >
-            <CustomButton onClick={handleStartRoom} $color="#45818E">
+            <CustomButton onClick={handleStartGame} $color="#45818E">
               Iniciar Juego
             </CustomButton>
           </div>
