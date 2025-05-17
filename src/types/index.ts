@@ -6,6 +6,7 @@ export interface User {
   avatar: number;
   lastLogin?: any;
   score?: number;
+  ready?: boolean;
 }
 
 // Tipos para salas
@@ -15,6 +16,14 @@ export interface Room {
   createdAt: string;
   status?: "waiting" | "active" | "responding";
   users: Record<string, User>;
+  answers?: RoomAnswer[];
+}
+
+// Tipos para respuestas en salas
+export interface RoomAnswer {
+  question: string;
+  answer: string;
+  userId: string;
 }
 
 // Tipos para el contexto de Firebase

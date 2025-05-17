@@ -13,6 +13,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useHall } from "@/hooks/useHall";
 import { useAuthContext } from "@/contexts/auth.context";
 import { RoomService } from "@/services/room.service";
+import { UserService } from "@/services/user.service";
 
 const Questions = () => {
   const [selectedQuestions, setSelectedQuestions] = useState<
@@ -62,7 +63,25 @@ const Questions = () => {
     try {
       setIsSubmitting(true);
 
-      // Guardar las respuestas del usuario (aquí puedes implementar la lógica para guardar las respuestas)
+      if (!currentUser) {
+        throw new Error("Usuario no autenticado");
+      }
+
+      // Preparar las respuestas para guardar en la base de datos
+      const questionAnswers = selectedQuestions.map((q, index) => ({
+        question: q.question,
+        answer: answers[index],
+      }));
+
+      // Guardar las respuestas del usuario en la sala
+      await RoomService.saveUserAnswers(
+        roomId,
+        currentUser.uid,
+        questionAnswers
+      );
+
+      // Actualizar el estado "ready" del usuario a true
+      await UserService.setUserReady(currentUser.uid, true);
 
       // Si es el creador, cambiar el estado de la sala a "active"
       if (isCreator) {

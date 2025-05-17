@@ -61,6 +61,16 @@ export class RoomUseCase {
     }
   }
 
+  // Remover answers de una sala
+  static async removeAnswersFromRoom(roomId: string): Promise<void> {
+    try {
+      await RoomService.removeAnswers(roomId);
+    } catch (error) {
+      console.error("Error en removeAnswersFromRoom:", error);
+      throw error;
+    }
+  }
+
   // Salir de una sala
   static async leaveRoom(roomId: string): Promise<void> {
     try {

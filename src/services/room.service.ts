@@ -109,7 +109,7 @@ export class RoomService {
       throw error;
     }
   }
-  
+
   // Cambiar el estado de la sala a "responding" (para iniciar el juego)
   static async startGame(roomId: string): Promise<void> {
     try {
@@ -138,7 +138,9 @@ export class RoomService {
   // Eliminar un usuario de una sala
   static async removeUserFromRoom(roomId: string, uid: string): Promise<void> {
     try {
+      // Poner ready en false antes de eliminar al usuario de la sala
       const userRef = ref(db, `rooms/${roomId}/users/${uid}`);
+      await update(userRef, { ready: false });
       await remove(userRef);
     } catch (error) {
       console.error("Error en removeUserFromRoom:", error);
@@ -153,6 +155,7 @@ export class RoomService {
   ): () => void {
     const usersRef = ref(db, `rooms/${roomId}/users`);
     const roomRef = ref(db, `rooms/${roomId}`);
+    const answersRef = ref(db, `rooms/${roomId}/answers`);
 
     const unsubscribe = onValue(usersRef, async (snapshot) => {
       if (snapshot.exists()) {
@@ -162,25 +165,15 @@ export class RoomService {
         if (usersArray.length === 0) {
           try {
             // Si no hay usuarios, cambiar el estado de la sala a "waiting"
-            await update(roomRef, { status: "waiting" });
+            await update(roomRef, {
+              status: "waiting",
+            });
           } catch (error) {
             console.error(
-              `Error al actualizar el estado de la sala ${roomId} a waiting:`,
+              `Error al actualizar el estado de la sala ${roomId} a waiting `,
               error
             );
           }
-        }
-      } else {
-        // Si el nodo 'users' no existe, significa que no hay usuarios
-        callback([]);
-        try {
-          // Cambiar el estado de la sala a "waiting"
-          await update(roomRef, { status: "waiting" });
-        } catch (error) {
-          console.error(
-            `Error al actualizar el estado de la sala ${roomId} a waiting (nodo users no existe):`,
-            error
-          );
         }
       }
     });
@@ -192,5 +185,43 @@ export class RoomService {
   static setupUserDisconnect(roomId: string, uid: string): void {
     const userRef = ref(db, `rooms/${roomId}/users/${uid}`);
     onDisconnect(userRef).remove();
+  }
+
+  // Guardar respuestas de usuario en la sala
+  static async saveUserAnswers(
+    roomId: string,
+    userId: string,
+    questionAnswers: { question: string; answer: string }[]
+  ): Promise<void> {
+    try {
+      const answersRef = ref(db, `rooms/${roomId}/answers`);
+      const snapshot = await get(answersRef);
+
+      let currentAnswers = [];
+      if (snapshot.exists()) {
+        currentAnswers = snapshot.val();
+      }
+
+      const newAnswers = questionAnswers.map((qa) => ({
+        question: qa.question,
+        answer: qa.answer,
+        userId: userId,
+      }));
+
+      await set(answersRef, [...currentAnswers, ...newAnswers]);
+    } catch (error) {
+      console.error("Error en saveUserAnswers:", error);
+      throw error;
+    }
+  }
+
+  static async removeAnswers(roomId: string): Promise<void> {
+    try {
+      const answersRef = ref(db, `rooms/${roomId}/answers`);
+      await remove(answersRef);
+    } catch (error) {
+      console.error("Error en removeAnswers:", error);
+      throw error;
+    }
   }
 }

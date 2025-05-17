@@ -88,10 +88,11 @@ export default function SelectRoom() {
     }
   };
 
-  const handleClickRoom = (e: React.MouseEvent<HTMLLIElement>) => {
+  const handleClickRoom = async (e: React.MouseEvent<HTMLLIElement>) => {
     e.preventDefault();
     const roomId = e.currentTarget.querySelector("p")?.textContent;
     if (roomId) {
+      await RoomUseCase.removeAnswersFromRoom(roomId);
       router.push(`/hall/${roomId}`);
     }
   };

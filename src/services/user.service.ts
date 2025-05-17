@@ -6,6 +6,7 @@ import {
   onValue,
   onDisconnect,
   serverTimestamp,
+  update,
 } from "firebase/database";
 import type { User } from "../types";
 
@@ -85,5 +86,19 @@ export class UserService {
     });
 
     return () => unsubscribe();
+  }
+
+  // Actualizar el estado "ready" del usuario
+  static async setUserReady(
+    userId: string,
+    ready: boolean = true
+  ): Promise<void> {
+    try {
+      const userRef = ref(db, `users/${userId}`);
+      await update(userRef, { ready });
+    } catch (error) {
+      console.error("Error en setUserReady:", error);
+      throw error;
+    }
   }
 }
